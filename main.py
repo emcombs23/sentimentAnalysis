@@ -10,7 +10,8 @@ load_dotenv()
 
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
-CATEGORIES = ['positive', 'negative', 'neutral']
+MODEL = 'gemini-flash-lite-latest'
+
 
 SYSTEM_PROMPT = """
 You are a sentiment classifier.
@@ -20,12 +21,16 @@ No punctuation, no explanation, just the single word.
 
 app = FastAPI()
 
-@app.get("/categories")
-def get_categories():
-    return {"categories": CATEGORIES}
 
 
-
+@app.get("/classify")
+def classify(text: str):
+    response = client.models.generate_content(
+        model=MODEL,
+        config = types.GenerateContentConfig(system_instructions=SYSTEM_PROMPT),
+        contents = text
+    )
+    return response.text
 
 
 
